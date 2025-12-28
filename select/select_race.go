@@ -1,21 +1,41 @@
 package select_test
 
 import (
+	"fmt"
 	"net/http"
+	"time"
 )
 
-func Racer(a, b string) (winner string) {
-	/*you can wait for values to be sent to a channel with myVar := <-ch. This is a blocking call, as you're waiting for a value.
+// func Racer(a, b string, timeout time.Duration) (winner string, error error) {
+// 	/*you can wait for values to be sent to a channel with myVar := <-ch. This is a blocking call, as you're waiting for a value.
 
-	select allows you to wait on multiple channels. The first one to send a value "wins" and the code underneath the case is executed.*/
-	select {
-	case <-ping(a):
-		return a
-	case <-ping(b):
-		return b
-	}
+// 	select allows you to wait on multiple channels. The first one to send a value "wins" and the code underneath the case is executed.*/
+// 	select {
+// 	case <-ping(a):
+// 		return a, nil
+// 	case <-ping(b):
+// 		return b, nil
+// 	case <-time.After(timeout):
+// 		return "", fmt.Errorf("timed out waiting for %s and %s", a, b)
+// 	}
+// }
+
+var tenSecondTimeout = 10 * time.Second
+
+func Racer(a, b string) (winner string, error error) {
+	return ConfigurableRacer(a, b, tenSecondTimeout)
 }
 
+func ConfigurableRacer(a, b string, timeout time.Duration) (winner string, error error) {
+	select {
+	case <-ping(a):
+		return a, nil
+	case <-ping(b):
+		return b, nil
+	case <-time.After(timeout):
+		return "", fmt.Errorf("timed out waiting for %s and %s", a, b)
+	}
+}
 func ping(url string) chan struct{} {
 	/*Always make channels
 
