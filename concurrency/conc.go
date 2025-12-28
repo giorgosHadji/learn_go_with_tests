@@ -12,6 +12,7 @@ func CheckWebsites(wc WebsiteChecker, urls []string) map[string]bool {
 			results[url] = wc(url)
 		}()
 	}
+	// find race conditions with  go test -race .
 	time.Sleep(2 * time.Second)
 	return results
 }
